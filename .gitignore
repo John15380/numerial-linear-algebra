@@ -1,0 +1,4 @@
+*.pdf
+question/
+*__pycache__/
+.vscode/

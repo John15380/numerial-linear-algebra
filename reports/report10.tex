@@ -1,0 +1,120 @@
+\documentclass[10pt, a4paper]{article}
+
+\usepackage{homework}
+
+\title{\textbf{《数值代数》上机作业10}}
+\author{岳瀚阳\quad\quad\quad\quad 3230104443}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+%----------------------------------------------------------------------
+\section{差分格式与迭代方法}
+%----------------------------------------------------------------------
+
+考虑 $(n-1)\times(n-1)$ 三对角线性方程组 $Ax=b$，其中
+
+\[
+A = \begin{bmatrix}
+-(2\varepsilon+h) & \varepsilon+h \\
+\varepsilon & -(2\varepsilon+h) & \varepsilon+h \\
+& \ddots & \ddots & \ddots \\
+& & \varepsilon & -(2\varepsilon+h) & \varepsilon+h \\
+& & & \varepsilon & -(2\varepsilon+h)
+\end{bmatrix}_{(n-1)\times(n-1)},
+\quad
+b = a h^2 \begin{bmatrix} 1 \\ 1 \\ \vdots \\ 1 \\ 1 \end{bmatrix} - (\varepsilon+h) \begin{bmatrix} 0 \\ 0 \\ \vdots \\ 0 \\ 1 \end{bmatrix}
+\]
+
+取 $a=0.5$，$n=100$（$h=0.01$），分别对 $\varepsilon = 1,\;0.1,\;0.01,\;0.0001$ 四种情况求解。
+
+将 $A$ 分裂为 $A = D - L - U$，其中 $D$ 为对角部分、$-L$ 为严格下三角部分、$-U$ 为严格上三角部分。三种迭代格式及迭代矩阵为：
+\begin{align*}
+\text{Jacobi:}\quad & x^{(k+1)} = D^{-1}(L+U)\,x^{(k)} + D^{-1}b,\quad T_J = D^{-1}(L+U) \\
+\text{G-S:}\quad & x^{(k+1)} = (D-L)^{-1}U\,x^{(k)} + (D-L)^{-1}b,\quad T_{GS} = (D-L)^{-1}U \\
+\text{SOR:}\quad & x^{(k+1)} = (D-\omega L)^{-1}\big((1-\omega)D + \omega U\big)\,x^{(k)} + \omega(D-\omega L)^{-1}b
+\end{align*}
+
+最佳松弛因子由 Young 公式给出：
+\[
+\omega_{\text{opt}} = \frac{2}{1 + \sqrt{1 - \rho(T_J)^2}}
+\]
+其中 $\rho(T_J)$ 为 Jacobi 迭代矩阵的谱半径，通过调用 \texttt{np.linalg.eigvals} 数值计算 $T_J$ 的特征值获得。
+
+迭代终止准则为 $\|x^{(k+1)}-x^{(k)}\|_\infty < 5\times10^{-5}$，最大迭代次数 $5\times10^4$。以解析解验证数值精度。
+
+\subsection{收敛性分析}
+
+$A$ 的对角元绝对值 $|a_{ii}| = 2\varepsilon + h$，同行非对角元绝对值之和为 $\varepsilon + (\varepsilon+h) = 2\varepsilon + h$，$A$ 为弱对角占优矩阵，故 Jacobi 与 GS 均收敛。
+
+$T_J$ 的非零元为 $T_J(i,i-1) = \varepsilon/(2\varepsilon+h)$，$T_J(i,i+1) = (\varepsilon+h)/(2\varepsilon+h)$。由三对角矩阵特征值公式，
+\[
+\rho(T_J) \approx \frac{2\sqrt{\varepsilon(\varepsilon+h)}}{2\varepsilon+h}\cos\frac{\pi}{n}
+\]
+
+代入 $n=100$：$\varepsilon=1$ 时 $\rho(T_J) \approx 0.999$，收敛极慢；$\varepsilon=0.0001$ 时 $\rho(T_J) \approx 0.197$，收敛加快。GS 的谱半径满足 $\rho(T_{GS}) = \rho(T_J)^2$，迭代次数因此约为 Jacobi 的一半。
+
+%----------------------------------------------------------------------
+\section{数值结果}
+%----------------------------------------------------------------------
+
+取 $a=0.5$，$n=100$，$\varepsilon$ 遍历 $\{1,\;0.1,\;0.01,\;0.0001\}$，三种方法的迭代次数与精度对比如表~\ref{tab:results}。
+
+\begin{table}[H]
+    \centering
+    \caption{不同 $\varepsilon$ 下各迭代方法的迭代次数与最大误差}
+    \label{tab:results}
+    \begin{tabular}{ccccc}
+        \toprule
+        $\varepsilon$ & 方法 & $\omega$ & 迭代次数 & $\|x^{(k)} - x^*\|_\infty$ \\
+        \midrule
+        \multirow{3}{*}{$1$}
+            & Jacobi  & ---  & 5440 & $4.77\times10^{-2}$ \\
+            & G-S     & ---  & 2708 & $4.97\times10^{-2}$ \\
+            & SOR     & 1.9384 & 201  & $4.79\times10^{-4}$ \\
+        \midrule
+        \multirow{3}{*}{$0.1$}
+            & Jacobi  & ---  & 3512 & $2.20\times10^{-2}$ \\
+            & G-S     & ---  & 1774 & $2.33\times10^{-2}$ \\
+            & SOR     & 1.8921 & 149  & $9.23\times10^{-3}$ \\
+        \midrule
+        \multirow{3}{*}{$0.01$}
+            & Jacobi  & ---  & 483  & $6.64\times10^{-2}$ \\
+            & G-S     & ---  & 290  & $6.64\times10^{-2}$ \\
+            & SOR     & 1.4985 & 105  & $6.61\times10^{-2}$ \\
+        \midrule
+        \multirow{3}{*}{$0.0001$}
+            & Jacobi  & ---  & 114  & $4.97\times10^{-3}$ \\
+            & G-S     & ---  & 107  & $4.95\times10^{-3}$ \\
+            & SOR     & 1.0097 & 102  & $4.95\times10^{-3}$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+从表~\ref{tab:results} 可观察如下规律：
+
+\textbf{（1）收敛速度与 $\varepsilon$ 的关系。}
+$\varepsilon=1$ 时 $\rho(T_J)\approx0.999$，Jacobi 需 5440 次迭代；$\varepsilon=0.0001$ 时 $\rho(T_J)\approx0.197$，仅需 114 次。$\varepsilon$ 减小使 $T_J$ 的次对角元 $\varepsilon/(2\varepsilon+h)$ 趋近于 $0$，谱半径下降，所有方法均加速。GS 迭代次数约为 Jacobi 的一半，符合 $\rho(T_{GS}) \approx \rho(T_J)^2$。
+
+\textbf{（2）SOR 加速效果。}
+$\varepsilon=1$ 时 $\rho(T_J)\approx0.999$，$\omega_{\text{opt}}\approx1.94$，SOR 仅需 201 次迭代，相对 Jacobi 加速约 $27$ 倍；$\varepsilon=0.0001$ 时 $\rho(T_J)\approx0.197$，$\omega_{\text{opt}}\approx1.01$，SOR 效果与 GS 接近（102 vs 107 次）。这与 $\omega_{\text{opt}}$ 的计算公式一致：$\rho$ 越接近 $1$，$\omega_{\text{opt}}$ 越大，SOR 相对 Jacobi 的优势越明显。
+
+\textbf{（3）精度分析。}
+三种迭代法在同一 $\varepsilon$ 下的最大误差几乎一致，说明误差主要来自 $h=0.01$ 时的离散精度（量级约 $10^{-2}$）而非迭代过程。$\varepsilon=0.01$ 时误差最大（$6.6\times10^{-2}$），因为此时 $T_J$ 的超对角元 $(\varepsilon+h)/(2\varepsilon+h)\approx0.98$ 远大于次对角元 $\varepsilon/(2\varepsilon+h)\approx0.02$，此时 $T_J$ 的上三角部分远大于下三角部分，解的局部变化较剧烈，$h=0.01$ 难以捕捉；$\varepsilon=1$ 时矩阵元素较均匀，误差约 $5\times10^{-2}$；$\varepsilon=0.0001$ 时下三角部分 $\varepsilon$ 几乎为零，矩阵接近下三角，解接近线性，误差降至 $5\times10^{-3}$。
+
+$\varepsilon=1$ 时 SOR（$\omega=1.9384$）的数值精度（$4.79\times10^{-4}$）显著优于 Jacobi 和 GS（约 $5\times10^{-2}$），原因是后两者的迭代矩阵谱半径约 $0.999$，相邻两次迭代差 $5\times10^{-5}$ 的收敛判据在谱半径接近 $1$ 时不足以保证与真解的精度——迭代值虽已平稳，但与真解仍有明显差距。
+
+%----------------------------------------------------------------------
+\appendix
+\section{源代码}
+%----------------------------------------------------------------------
+
+\subsection{\texttt{hw10\_test.py}（主程序）}
+\lstinputlisting{../tests/hw10_test.py}
+
+\subsection{\texttt{iteration.py}（迭代方法）}
+\lstinputlisting{../algorithms/iteration.py}
+
+\end{document}

@@ -1,0 +1,50 @@
+%!TEX program = xelatex
+%
+% 数值代数上机作业模板样式文件
+% 基于report8/report.tex
+%
+
+\ProvidesPackage{homework}[2025/05/10 Homework Report Style]
+
+% 基础包
+\RequirePackage[UTF8]{ctex}
+\RequirePackage{amsmath, amssymb}
+\RequirePackage{booktabs}
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+\RequirePackage{geometry}
+\RequirePackage{float}
+\RequirePackage{multirow}
+
+% 页面设置
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% 代码高亮颜色定义
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codecomment}{RGB}{106,153,85}
+\definecolor{codestring}{RGB}{206,145,120}
+\definecolor{codekeyword}{RGB}{86,156,214}
+\definecolor{framerule}{RGB}{200,200,200}
+
+% 代码样式配置 - Python
+\lstset{
+    language=Python,
+    basicstyle=\small\ttfamily,
+    backgroundcolor=\color{codebg},
+    commentstyle=\color{codecomment},
+    stringstyle=\color{codestring},
+    keywordstyle=\color{codekeyword}\bfseries,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt,
+    frame=single,
+    rulecolor=\color{framerule},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    xleftmargin=15pt,
+    captionpos=b,
+}
+
+% 代码标题名称
+\renewcommand{\lstlistingname}{代码}

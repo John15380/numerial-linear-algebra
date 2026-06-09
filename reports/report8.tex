@@ -1,0 +1,90 @@
+\documentclass[10pt, a4paper]{article}
+
+\usepackage{homework}
+
+\title{\textbf{《数值代数》上机作业8}}
+\author{岳瀚阳\quad\quad\quad\quad 3230104443}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+%----------------------------------------------------------------------
+\section{QR 分解求解线性方程组}
+%----------------------------------------------------------------------
+
+三个测试系统的构造方式：第一个 $84$ 阶三对角系统的真解为全 $1$ 向量，对应右端项 $b=(7,15,\ldots,15,14)^\top$；第二个 $100$ 阶系统的 $b$ 随机选取；Hilbert 矩阵的真解亦取全 $1$ 向量。各方法求解结果对比如下：
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{llcc}
+        \toprule
+        问题 & 方法 & 相对误差 $\|\cdot\|_\infty$ & 残差 $\|Ax-b\|_\infty$ \\
+        \midrule
+        \multirow{2}{*}{三对角 $n=84$，$(6,1,8)$}
+            & Gauss 列主元 & $2.80\times10^{-6}$ & $\approx 0$ \\
+            & QR 分解      & 失败（零主元）       & --- \\
+        \midrule
+        三对角 $n=100$，$(10,1,1)$ & QR 分解 & $9.15\times10^{-16}$ & $9.95\times10^{-14}$ \\
+        \midrule
+        Hilbert $n=40$ & QR 分解 & $1.49\times10^{2}$ & $5.33\times10^{-15}$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+对于三对角矩阵 $(84, 6, 1, 8)$，Gauss 列主元消元可以正常求解（相对误差约 $3\times10^{-6}$），因为其 $LU$ 分解的所有主元均在 $4\sim6$ 之间，三角分解稳定。而 Householder QR 分解在最后一步将该矩阵归约时，$R$ 的最后一个对角元恰好为精确零，回代时产生除以零，结果为 NaN，这是 QR 分解对该特殊矩阵结构敏感所致，并非方程组无解。Hilbert 矩阵（$\kappa\sim10^{58}$）任何直接法均无法保持解的精度；QR 残差极小，说明正交变换本身数值稳定，误差来源于问题的极度病态。
+
+%----------------------------------------------------------------------
+\section{最小二乘多项式拟合}
+%----------------------------------------------------------------------
+
+对表 3.2 中 7 个数据点，构造设计矩阵 $A\in\mathbb{R}^{7\times3}$，$A_{i*}=(t_i^2,\ t_i,\ 1)$，通过 QR 分解求最小二乘解，得
+
+\[
+    \boxed{y = 1.0000\,t^2 + 1.0000\,t + 1.0000}
+\]
+
+残向量 2-范数为 $9.02\times10^{-16}$，接近机器精度，数据点精确落在该二次曲线上。
+
+%----------------------------------------------------------------------
+\section{房产估价线性模型}
+%----------------------------------------------------------------------
+
+以 28 组数据构造设计矩阵 $A\in\mathbb{R}^{28\times12}$（首列为常数 1），QR 分解后求最小二乘解如下：
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{cc|cc}
+        \toprule
+        参数 & 值 & 参数 & 值 \\
+        \midrule
+        $x_0$（截距）    & $1.705930$  & $x_6$（房屋数）  & $-1.553541$ \\
+        $x_1$（税）      & $0.701557$  & $x_7$（房龄）    & $0.643194$  \\
+        $x_2$（浴室数）  & $11.149932$ & $x_8$（建筑类型）& $-0.072160$ \\
+        $x_3$（占地面积）& $0.181583$  & $x_9$（户型）    & $0.734492$  \\
+        $x_4$（居住面积）& $13.009845$ & $x_{10}$（壁炉数）& $1.887127$ \\
+        $x_5$（车库数）  & $1.806113$  & $x_{11}$（车库）  & $3.227043$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+%----------------------------------------------------------------------
+\appendix
+\section{源代码}
+%----------------------------------------------------------------------
+
+\subsection{\texttt{hw8\_test.py}}
+\lstinputlisting{../tests/hw8_test.py}
+
+\subsection{\texttt{qr\_decomposition.py}}
+\lstinputlisting{../algorithms/qr_decomposition.py}
+
+\subsection{\texttt{direct\_solver.py}（\texttt{back\_substitution}）}
+\lstinputlisting[firstline=2,lastline=2]{../algorithms/direct_solver.py}
+\lstinputlisting[firstline=15,lastline=24]{../algorithms/direct_solver.py}
+
+\subsection{\texttt{create\_matrix.py}（\texttt{create\_tridiagonal}，\texttt{create\_hilbert}）}
+\lstinputlisting[firstline=1,lastline=34]{../algorithms/create_matrix.py}
+
+\end{document}
