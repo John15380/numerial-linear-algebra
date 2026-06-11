@@ -23,6 +23,7 @@
 | `matrix_utils.py` | 矩阵构造工具：对称三对角矩阵 `create_tridiagonal_matrix`、首一多项式友矩阵 `companion_matrix` |
 | `symmetric_qr.py` | **隐式对称 QR 算法**：先 Householder 三对角化，再带 Wilkinson 位移的隐式 QR 迭代求全部特征值和特征向量 |
 | `implicit_qr.py` | **Francis 双重位移 QR 算法**：先 Householder Hessenberg 化，再对 $M=H^2-sH+tI$ 做 QR 分解实现双重位移步，求实 Schur 形式与特征值；含反幂法求特征向量 |
+| `jacobi_eigen.py` | **经典 Jacobi 方法**：逐轮扫描非对角元，施以平面旋转对消，求实对称矩阵的全部特征值和特征向量 |
 | `direct_solver.py` | 直接解法：Gauss 消去（无选主元 / 列主元）、Cholesky 分解、$LDL^T$ 分解、回代法 |
 | `iteration.py` | 迭代方法：Jacobi、Gauss-Seidel、SOR 迭代，以及最佳松弛因子计算 |
 | `conjugate_gradient.py` | 共轭梯度法（CG）求解对称正定线性方程组 |
@@ -67,6 +68,10 @@
   1. **隐式对称 QR 算法**：求对称三对角矩阵（教材 p.244 1(2)、2(2)）的全部特征值与特征向量
   2. **Francis 双重位移 QR 算法**：求 $x^{41}+x^3+1=0$ 的全部根，以及矩阵 $A(x)$ 在 $x=0.9,1.0,1.1$ 时的特征值
 - **算法**：`symmetric_qr.py`, `implicit_qr.py`, `matrix_utils.py`
+
+### 作业 15（hw15_test.py）
+- **内容**：经典 Jacobi 方法求实对称矩阵（教材 p.244 1(2)，$n=50\sim100$）的全部特征值和特征向量
+- **算法**：`jacobi_eigen.py`, `matrix_utils.py`
 
 ## 使用方法
 

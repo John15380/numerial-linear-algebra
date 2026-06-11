@@ -21,8 +21,8 @@ $(REPORTS_DIR)/%.pdf: $(REPORTS_DIR)/%.tex $(REPORTS_DIR)/homework.sty
 	cd $(REPORTS_DIR) && $(PDFLATEX) -interaction=nonstopmode $(notdir $<) >/dev/null 2>&1 || true
 
 # 支持 make <num> 编译指定作业，例如 make 14
-.PHONY: $(filter 8 10 11 12 14,$(MAKECMDGOALS))
-8 10 11 12 14: %: $(REPORTS_DIR)/report%.pdf
+.PHONY: $(filter 8 10 11 12 14 15,$(MAKECMDGOALS))
+8 10 11 12 14 15: %: $(REPORTS_DIR)/report%.pdf
 
 # 清理：删除编译生成的辅助文件，仅保留 .tex 和 .pdf
 clean:
